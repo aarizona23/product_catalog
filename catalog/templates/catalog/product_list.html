@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Catalog</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .filter-box, .results { margin-bottom: 20px; }
+        .product {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .product strong {
+            font-size: 18px;
+        }
+        .product p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Catalog</h1>
+
+    <div class="container py-5">
+        <h1 class="mb-4 text-center">🛍 Product Catalog</h1>
+
+        <!-- Filters -->
+        <form id="filterForm" onsubmit="searchProducts(event)" class="bg-white p-4 rounded shadow-sm mb-5">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="category" class="form-label">Category</label>
+                    <select id="category" class="form-select" name="category_id">
+                        <option value="">All</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="tags" class="form-label">Tags (Ctrl+Click for multiple)</label>
+                    <select id="tags" class="form-select" multiple name="tag_ids">
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="query" class="form-label">Search Description</label>
+                    <input type="text" class="form-control" id="query" name="query" placeholder="e.g. 'wireless'">
+                </div>
+
+                <div class="col-12 text-end mt-3">
+                    <button type="submit" class="btn btn-primary">🔍 Search</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Product Results -->
+        <div id="products" class="row gy-4"></div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8000/catalog/api";
+
+        // Load categories and tags on page load
+        window.onload = async function () {
+            const categories = await fetch(`${API_BASE}/categories/`).then(res => res.json());
+            const tags = await fetch(`${API_BASE}/tags/`).then(res => res.json());
+
+            const categorySelect = document.getElementById("category");
+            categories.forEach(cat => {
+                const option = document.createElement("option");
+                option.value = cat.id;
+                option.textContent = cat.name;
+                categorySelect.appendChild(option);
+            });
+
+            const tagSelect = document.getElementById("tags");
+            tags.forEach(tag => {
+                const option = document.createElement("option");
+                option.value = tag.id;
+                option.textContent = tag.name;
+                tagSelect.appendChild(option);
+            });
+        };
+        function getCSRFToken() {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith("csrftoken=")) {
+                        cookieValue = decodeURIComponent(cookie.substring("csrftoken=".length));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        async function searchProducts(event) {
+            event.preventDefault();
+
+            const query = document.getElementById("query").value;
+            const categoryId = document.getElementById("category").value;
+            const tagOptions = document.getElementById("tags").selectedOptions;
+            const tagIds = Array.from(tagOptions).map(opt => parseInt(opt.value));
+
+            const body = {
+                ...(query && { query }),
+                ...(categoryId && { category_id: parseInt(categoryId) }),
+                ...(tagIds.length > 0 && { tag_ids: tagIds })
+            };
+
+            const response = await fetch(`${API_BASE}/products/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: JSON.stringify(body)
+            });
+
+            const resultsDiv = document.getElementById("products");
+            resultsDiv.innerHTML = "";
+
+            if (response.ok) {
+                const products = await response.json();
+                if (products.length === 0) {
+                    resultsDiv.innerHTML = "<p>No products found.</p>";
+                    return;
+                }
+                products.forEach(product => {
+                    const div = document.createElement("div");
+                    div.className = "product col-md-4";
+
+                    const tags = product.tag_names.map(tag => tag.name).join(', ');
+                    const category = product.category_name ? product.category_name.name : 'No category';
+
+                    div.innerHTML = `
+                        <strong>${product.name}</strong><br>
+                        <p>${product.description}</p>
+                        <p><strong>Category:</strong> ${category}</p>
+                        <p><strong>Tags:</strong> ${tags || 'None'}</p>
+                    `;
+                    resultsDiv.appendChild(div);
+                });
+            } else {
+                resultsDiv.innerHTML = "<p>No products found.</p>";
+            }
+        }
+    </script>
+</body>
+</html>
