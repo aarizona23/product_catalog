@@ -11,19 +11,19 @@ Tech Stack
 - HTML, CSS (Bootstrap), and JavaScript
 - SQLite
 
-Code of the backend:
-in the catalog Django app
-Code of the frontend:
-in the templates directory 
+Code of the backend: \n
+in the catalog Django app \n
+Code of the frontend: \n
+in the templates directory \n 
 
 Setup Instructions
-1. Clone the repository
-git clone https://github.com/your-username/product-catalog.git
+1. Clone the repository \n
+git clone https://github.com/your-username/product-catalog.git \n
 cd product-catalog
 
-2. Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate
+2. Create and activate a virtual environment \n
+python -m venv venv \n
+source venv/bin/activate \n
 
 4. Install dependencies
 pip install -r requirements.txt
