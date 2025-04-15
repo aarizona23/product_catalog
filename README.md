@@ -23,26 +23,38 @@ Product Catalog Filtering App
 ```bash
 git clone https://github.com/your-username/product-catalog.git  
 cd product-catalog
-Create and activate a virtual environment
+```
 
-bash
+2. Create and activate a virtual environment
+
+```bash
 python -m venv venv  
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-Install dependencies
+```
 
-bash
+3. Install dependencies
+
+```bash
 pip install -r requirements.txt
-Apply migrations
+```
 
-bash
+4. Apply migrations
+
+```bash
 python manage.py migrate
-Create superuser
+```
 
-bash
+5. Create superuser
+
+```bash
 python manage.py createsuperuser
-Run the development server
+```
 
-bash
+6. Run the development server
+
+```bash
 python manage.py runserver
-Open the website page
+```
+
+7. Open the website page
 http://127.0.0.1:8000/catalog/products-page/
