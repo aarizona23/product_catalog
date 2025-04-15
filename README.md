@@ -16,6 +16,7 @@ Product Catalog Filtering App
 
 **Backend:** in the `catalog` Django app  
 **Frontend:** in the `templates` directory  
+***I used ChatGPT to write HTML code***
 
 ## ⚙️ Setup Instructions
 
